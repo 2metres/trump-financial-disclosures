@@ -5,6 +5,7 @@
   interface GraphNode {
     id: string; type: string; name: string; agency?: string;
     title?: string; net_worth_low?: number; count?: number; category?: string;
+    total_value?: number;
     x?: number; y?: number; fx?: number | null; fy?: number | null;
   }
   interface GraphLink { source: any; target: any }
@@ -79,12 +80,16 @@
 
     const g = svg.append('g')
 
+    // Value-based radius scale for entity nodes
+    const valueExtent = d3.extent(data.nodes.filter(n => n.type === 'entity'), (n: any) => n.total_value || 0) as [number, number]
+    const radiusScale = d3.scaleSqrt().domain([0, valueExtent[1]]).range([4, 24])
+
     const simulation = d3.forceSimulation(data.nodes as any)
       .force('link', d3.forceLink(data.links as any).id((d: any) => d.id).distance(60).strength(0.15))
       .force('charge', d3.forceManyBody().strength((d: any) => d.type === 'entity' ? -50 : -10))
       .force('x', d3.forceX(width / 2).strength(0.04))
       .force('y', d3.forceY(height / 2).strength(0.04))
-      .force('collision', d3.forceCollide().radius((d: any) => d.type === 'entity' ? 12 : 4))
+      .force('collision', d3.forceCollide().radius((d: any) => d.type === 'entity' ? radiusScale(d.total_value || 0) + 2 : 4))
 
     const link = g.append('g')
       .selectAll('line')
@@ -95,22 +100,34 @@
       .attr('stroke-width', 0.5)
     linkSelection = link
 
-    const node = g.append('g')
-      .selectAll('circle')
-      .data(data.nodes)
+    const nodeGroup = g.append('g')
+
+    // Entity nodes: circles sized by total dollar value
+    const entityNodes = nodeGroup.selectAll('circle')
+      .data(data.nodes.filter(n => n.type === 'entity'))
       .join('circle')
-      .attr('r', (d: any) => {
-        if (d.type === 'entity') return Math.max(4, Math.min(16, Math.sqrt(d.count || 1) * 2.5))
-        return 3
-      })
-      .attr('fill', (d: any) => {
-        if (d.type === 'entity') return categoryColors[d.category || 'other'] || '#737373'
-        return getAgencyColor(d.agency || 'Unknown')
-      })
-      .attr('fill-opacity', (d: any) => d.type === 'entity' ? 0.85 : 0.7)
+      .attr('r', (d: any) => radiusScale(d.total_value || 0))
+      .attr('fill', (d: any) => categoryColors[d.category || 'other'] || '#737373')
+      .attr('fill-opacity', 0.85)
       .attr('stroke', 'none')
       .attr('cursor', 'pointer')
       .call(drag(simulation) as any)
+
+    // Appointee nodes: squircle-diamonds (rounded rect rotated 45°)
+    const appointeeNodes = nodeGroup.selectAll('rect')
+      .data(data.nodes.filter(n => n.type === 'appointee'))
+      .join('rect')
+      .attr('width', 6).attr('height', 6)
+      .attr('x', -3).attr('y', -3)
+      .attr('rx', 1.5)
+      .attr('fill', (d: any) => getAgencyColor(d.agency || 'Unknown'))
+      .attr('fill-opacity', 0.7)
+      .attr('stroke', 'none')
+      .attr('cursor', 'pointer')
+      .call(drag(simulation) as any)
+
+    // Combined selection for shared event handling
+    const node = nodeGroup.selectAll<SVGElement, GraphNode>('circle, rect')
     nodeSelection = node
 
     // Entity labels for large nodes
@@ -140,7 +157,7 @@
       const lines: string[] = []
       if (d.type === 'entity') {
         lines.push(`<strong>${d.name}</strong>`)
-        lines.push(`${d.category?.replace('_', ' ') || 'entity'} · ${d.count || 0} appointees`)
+        lines.push(`${d.category?.replace('_', ' ') || 'entity'} · ${d.count || 0} appointees · ${formatMoney(d.total_value)}`)
       } else {
         lines.push(`<strong>${d.name}</strong>`)
         if (d.title) lines.push(d.title)
@@ -201,7 +218,8 @@
       link
         .attr('x1', (d: any) => d.source.x).attr('y1', (d: any) => d.source.y)
         .attr('x2', (d: any) => d.target.x).attr('y2', (d: any) => d.target.y)
-      node.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y)
+      entityNodes.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y)
+      appointeeNodes.attr('transform', (d: any) => `translate(${d.x},${d.y}) rotate(45)`)
       entityLabel.attr('x', (d: any) => d.x).attr('y', (d: any) => d.y)
     })
 
@@ -267,8 +285,11 @@
           </span>
         </div>
         <h3 class="font-serif text-xl text-neutral-100 leading-tight mb-1">{selected.name}</h3>
-        <p class="font-mono text-[11px] text-neutral-500 mb-4">
+        <p class="font-mono text-[11px] text-neutral-500 mb-1">
           Shared by <span class="text-gold-400">{selected.count}</span> appointees
+        </p>
+        <p class="font-mono text-[11px] text-neutral-500 mb-4">
+          Aggregate value: <span class="text-gold-400">{formatMoney(selected.total_value)}</span>
         </p>
 
         <h4 class="font-mono text-[10px] text-neutral-600 uppercase tracking-wider mb-2">Appointees</h4>

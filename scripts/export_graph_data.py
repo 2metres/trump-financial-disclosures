@@ -60,20 +60,29 @@ def main():
     appointee_list = [dict(zip(cols, row)) for row in appointees]
     appointee_by_slug = {a["slug"]: a for a in appointee_list}
 
-    # Get all disclosure entries with descriptions
+    # OGE 278e value category midpoints
+    VALUE_MIDPOINTS = {
+        '1': 8_000, '2': 32_500, '3': 75_000, '4': 175_000,
+        '5': 375_000, '6': 750_000, '7': 3_000_000, '8': 15_000_000,
+        '9': 37_500_000, '10': 75_000_000,
+    }
+
+    # Get all disclosure entries with descriptions and values
     entries = con.sql("""
-        SELECT slug, description FROM disclosure_entries
+        SELECT slug, description, value_category_id FROM disclosure_entries
         WHERE description IS NOT NULL AND description != ''
     """).fetchall()
 
-    # Build entity → appointees mapping
+    # Build entity → appointees mapping and entity → total value
     entity_to_slugs = defaultdict(set)
     slug_to_entities = defaultdict(set)
-    for slug, desc in entries:
+    entity_total_value: dict[str, int] = defaultdict(int)
+    for slug, desc, val_cat in entries:
         desc = desc.strip()
         if desc:
             entity_to_slugs[desc].add(slug)
             slug_to_entities[slug].add(desc)
+            entity_total_value[desc] += VALUE_MIDPOINTS.get(val_cat or '', 0)
 
     # Filter to entities shared by 2+ appointees
     shared_entities = {k: v for k, v in entity_to_slugs.items() if len(v) >= 2}
@@ -96,22 +105,25 @@ def main():
         n = n.replace('&amp;', '&').replace(',', '').replace('.', '')
         return n
 
-    # Group entities by normalized name, merge their slug sets
-    from collections import OrderedDict
-    norm_groups: dict[str, tuple[str, set]] = {}  # norm -> (best_name, merged_slugs)
+    # Group entities by normalized name, merge their slug sets and values
+    norm_groups: dict[str, tuple[str, set, int]] = {}  # norm -> (best_name, merged_slugs, merged_value)
     for entity, slugs in interesting_entities.items():
         norm = normalize_name(entity)
+        val = entity_total_value.get(entity, 0)
         if norm in norm_groups:
-            best_name, merged = norm_groups[norm]
+            best_name, merged, merged_val = norm_groups[norm]
             merged.update(slugs)
+            merged_val += val
             # Prefer the name with more info or proper casing
             if len(entity) > len(best_name) or (entity[0].isupper() and best_name[0].islower()):
                 best_name = entity
-            norm_groups[norm] = (best_name, merged)
+            norm_groups[norm] = (best_name, merged, merged_val)
         else:
-            norm_groups[norm] = (entity, set(slugs))
+            norm_groups[norm] = (entity, set(slugs), val)
 
-    deduped_entities = {name: slugs for name, slugs in norm_groups.values()}
+    deduped_entities: dict[str, tuple[set, int]] = {
+        name: (slugs, val) for name, slugs, val in norm_groups.values()
+    }
     print(f"After dedup: {len(deduped_entities)} (was {len(interesting_entities)})")
 
     # Categorize entities for visual grouping
@@ -172,10 +184,10 @@ def main():
             return 'consumer'
         return 'other'
 
-    top_entities = sorted(deduped_entities.items(), key=lambda x: -len(x[1]))[:100]
+    top_entities = sorted(deduped_entities.items(), key=lambda x: -len(x[1][0]))[:100]
 
     involved_slugs = set()
-    for _, slugs in top_entities:
+    for _, (slugs, _val) in top_entities:
         involved_slugs.update(slugs)
 
     bipartite_nodes = []
@@ -192,7 +204,7 @@ def main():
                 "net_worth_low": a["net_worth_low"],
             })
 
-    for entity, slugs in top_entities:
+    for entity, (slugs, total_val) in top_entities:
         eid = f"e:{entity}"
         cat = categorize(entity)
         bipartite_nodes.append({
@@ -200,6 +212,7 @@ def main():
             "type": "entity",
             "name": entity,
             "count": len(slugs),
+            "total_value": total_val,
             "category": cat,
         })
         for slug in slugs:
@@ -210,7 +223,7 @@ def main():
     with open(os.path.join(OUT, "bipartite.json"), "w") as f:
         json.dump(bipartite, f)
     print(f"Bipartite: {len(bipartite_nodes)} nodes, {len(bipartite_links)} links")
-    cats = Counter(categorize(e) for e, _ in top_entities)
+    cats = Counter(categorize(e) for e, (_, _v) in top_entities)
     print(f"  Categories: {dict(cats)}")
 
     # --- NETWORK GRAPH (appointee ↔ appointee) ---
