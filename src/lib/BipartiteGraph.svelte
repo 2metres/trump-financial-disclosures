@@ -70,7 +70,7 @@
     if (nodeSelection)
       nodeSelection.attr('fill-opacity', (d: any) => (d.type === 'entity' ? 0.85 : 0.7))
     if (linkSelection)
-      linkSelection.attr('stroke', '#333').attr('stroke-opacity', 0.12).attr('stroke-width', 0.5)
+      linkSelection.attr('stroke', '#333').attr('stroke-opacity', 0).attr('stroke-width', 0.5)
     if (labelSelection) labelSelection.attr('opacity', 1)
   }
 
@@ -205,38 +205,123 @@
         : appointeeSizeScale(d.net_worth_low || 0)
     }
 
-    // Pre-position nodes near center so they don't fly in from (0,0)
+    // Compute category cluster targets arranged in a circle
+    const categories = Object.keys(categoryColors)
+    const clusterCenters: Record<string, { x: number; y: number }> = {}
+    const clusterRadius = Math.min(width, height) * 0.35
+    categories.forEach((cat, i) => {
+      const angle = (2 * Math.PI * i) / categories.length
+      clusterCenters[cat] = {
+        x: width / 2 + Math.cos(angle) * clusterRadius,
+        y: height / 2 + Math.sin(angle) * clusterRadius,
+      }
+    })
+
+    // Build a lookup: node id → connection count, and appointee id → connected entity categories
+    const nodeDegree = new Map<string, number>()
+    for (const l of data.links as any[]) {
+      const sid = l.source.id ?? l.source
+      const tid = l.target.id ?? l.target
+      nodeDegree.set(sid, (nodeDegree.get(sid) || 0) + 1)
+      nodeDegree.set(tid, (nodeDegree.get(tid) || 0) + 1)
+    }
+    const maxDegree = Math.max(...nodeDegree.values(), 1)
+
+    const appointeeCategories = new Map<string, string[]>()
+    for (const l of data.links as any[]) {
+      const sid = l.source.id ?? l.source
+      const tid = l.target.id ?? l.target
+      const sourceNode = data.nodes.find((n) => n.id === sid)
+      const targetNode = data.nodes.find((n) => n.id === tid)
+      if (sourceNode?.type === 'appointee' && targetNode?.type === 'entity') {
+        const cats = appointeeCategories.get(sid) || []
+        cats.push(targetNode.category || 'other')
+        appointeeCategories.set(sid, cats)
+      } else if (targetNode?.type === 'appointee' && sourceNode?.type === 'entity') {
+        const cats = appointeeCategories.get(tid) || []
+        cats.push(sourceNode.category || 'other')
+        appointeeCategories.set(tid, cats)
+      }
+    }
+
+    // Determine cluster target for each node
+    function clusterTarget(d: any): { x: number; y: number } {
+      if (d.type === 'entity') {
+        return clusterCenters[d.category || 'other'] || { x: width / 2, y: height / 2 }
+      }
+      // Appointees: average of their connected entity cluster centers
+      const cats = appointeeCategories.get(d.id) || []
+      if (cats.length === 0) return { x: width / 2, y: height / 2 }
+      // Use most common category (dominant holding sector)
+      const freq: Record<string, number> = {}
+      cats.forEach((c) => (freq[c] = (freq[c] || 0) + 1))
+      const dominant = Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0]
+      return clusterCenters[dominant] || { x: width / 2, y: height / 2 }
+    }
+
+    // Pre-position nodes near their cluster targets
     for (const n of data.nodes as any[]) {
-      n.x = width / 2 + (Math.random() - 0.5) * width * 0.3
-      n.y = height / 2 + (Math.random() - 0.5) * height * 0.3
+      const target = clusterTarget(n)
+      n.x = target.x + (Math.random() - 0.5) * clusterRadius * 0.5
+      n.y = target.y + (Math.random() - 0.5) * clusterRadius * 0.5
     }
 
     const simulation = d3
       .forceSimulation(data.nodes as any)
-      .alpha(0.5)
-      .alphaMin(0.005)
-      .alphaDecay(0.04)
-      .velocityDecay(0.65)
+      .alpha(1)
+      .alphaMin(0.001)
+      .alphaDecay(0.015)
+      .velocityDecay(0.4)
       .force(
         'link',
         d3
           .forceLink(data.links as any)
           .id((d: any) => d.id)
-          .distance(60)
-          .strength(0.15),
+          .distance(25)
+          .strength(0.2),
       )
       .force(
         'charge',
         d3
           .forceManyBody()
-          .strength((d: any) => -nodeRadius(d) * 8)
-          .distanceMax(350),
+          .strength((d: any) => -nodeRadius(d) * 6)
+          .distanceMax(300),
       )
-      .force('x', d3.forceX(width / 2).strength(0.01))
-      .force('y', d3.forceY(height / 2).strength(0.01))
+      .force(
+        'clusterX',
+        d3.forceX((d: any) => clusterTarget(d).x).strength((d: any) =>
+          d.type === 'entity' ? 0.4 : 0,
+        ),
+      )
+      .force(
+        'clusterY',
+        d3.forceY((d: any) => clusterTarget(d).y).strength((d: any) =>
+          d.type === 'entity' ? 0.4 : 0,
+        ),
+      )
+      .force(
+        'radial',
+        d3
+          .forceRadial(
+            (d: any) => {
+              if (d.type === 'entity') return clusterRadius
+              // High-degree appointees get pushed to a larger radius
+              const degree = nodeDegree.get(d.id) || 0
+              const ratio = degree / maxDegree
+              return clusterRadius * (0.4 + 0.8 * ratio)
+            },
+            width / 2,
+            height / 2,
+          )
+          .strength((d: any) => {
+            if (d.type === 'entity') return 0.08
+            const degree = nodeDegree.get(d.id) || 0
+            return 0.03 + 0.2 * (degree / maxDegree)
+          }),
+      )
       .force(
         'collision',
-        d3.forceCollide().radius((d: any) => nodeRadius(d) + 6).strength(0.8).iterations(2),
+        d3.forceCollide().radius((d: any) => nodeRadius(d) + 3).strength(0.7).iterations(2),
       )
 
     const link = g
@@ -245,7 +330,7 @@
       .data(data.links)
       .join('line')
       .attr('stroke', '#333')
-      .attr('stroke-opacity', 0.12)
+      .attr('stroke-opacity', 0)
       .attr('stroke-width', 0.5)
     linkSelection = link
 
@@ -260,11 +345,10 @@
       .attr('fill-opacity', 0.85)
       .attr('stroke', 'none')
       .attr('cursor', 'pointer')
-      .call(drag(simulation) as any)
 
     const appointeeNodes = nodeGroup
       .selectAll('rect')
-      .data(data.nodes.filter((n) => n.type === 'appointee'))
+      .data(data.nodes.filter((n) => n.type === 'appointee' && n.id !== 'trump-donald-j'))
       .join('rect')
       .attr('width', (d: any) => appointeeSizeScale(d.net_worth_low || 0))
       .attr('height', (d: any) => appointeeSizeScale(d.net_worth_low || 0))
@@ -275,26 +359,45 @@
       .attr('fill-opacity', 0.7)
       .attr('stroke', 'none')
       .attr('cursor', 'pointer')
-      .call(drag(simulation) as any)
 
-    const node = nodeGroup.selectAll<SVGElement, GraphNode>('circle, rect')
+    // Rounded star path generator for Trump node
+    function starPath(outerR: number, innerR: number, points: number): string {
+      const step = Math.PI / points
+      const pts: { x: number; y: number }[] = []
+      for (let i = 0; i < 2 * points; i++) {
+        const r = i % 2 === 0 ? outerR : innerR
+        const angle = i * step - Math.PI / 2
+        pts.push({ x: r * Math.cos(angle), y: r * Math.sin(angle) })
+      }
+      // Build a smooth closed path using quadratic bezier through midpoints
+      let d = `M${(pts[pts.length - 1].x + pts[0].x) / 2},${(pts[pts.length - 1].y + pts[0].y) / 2}`
+      for (let i = 0; i < pts.length; i++) {
+        const next = pts[(i + 1) % pts.length]
+        const mx = (pts[i].x + next.x) / 2
+        const my = (pts[i].y + next.y) / 2
+        d += `Q${pts[i].x},${pts[i].y},${mx},${my}`
+      }
+      return d + 'Z'
+    }
+
+    const trumpNode = nodeGroup
+      .selectAll('path.trump-star')
+      .data(data.nodes.filter((n) => n.id === 'trump-donald-j'))
+      .join('path')
+      .attr('class', 'trump-star')
+      .attr('d', (d: any) => {
+        const r = appointeeSizeScale(d.net_worth_low || 0)
+        return starPath(r, r * 0.45, 5)
+      })
+      .attr('fill', '#a3a3a3')
+      .attr('fill-opacity', 0.9)
+      .attr('stroke', 'none')
+      .attr('cursor', 'pointer')
+
+    const node = nodeGroup.selectAll<SVGElement, GraphNode>('circle, rect, path.trump-star')
     nodeSelection = node
 
-    const entityLabel = g
-      .append('g')
-      .selectAll('text')
-      .data(data.nodes.filter((n) => n.type === 'entity' && (n.count || 0) >= 20))
-      .join('text')
-      .text((d: any) => {
-        const name = d.name.length > 25 ? d.name.slice(0, 25) + '…' : d.name
-        return name
-      })
-      .attr('font-size', 7)
-      .attr('font-family', 'JetBrains Mono, monospace')
-      .attr('fill', '#888')
-      .attr('text-anchor', 'middle')
-      .attr('dy', -10)
-      .attr('pointer-events', 'none')
+    const entityLabel = g.append('g').selectAll('text').data([]).join('text')
     labelSelection = entityLabel
 
     const tooltip = d3.select(container).append('div').attr('class', 'tooltip').style('opacity', 0)
@@ -374,23 +477,52 @@
       }
     })
 
-    simulation.on('tick', () => {
-      link
-        .attr('x1', (d: any) => d.source.x)
-        .attr('y1', (d: any) => d.source.y)
-        .attr('x2', (d: any) => d.target.x)
-        .attr('y2', (d: any) => d.target.y)
-      entityNodes.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y)
-      appointeeNodes.attr('transform', (d: any) => `translate(${d.x},${d.y}) rotate(45)`)
-      entityLabel.attr('x', (d: any) => d.x).attr('y', (d: any) => d.y)
-    })
+    // Run simulation to completion synchronously before rendering
+    simulation.stop()
+    const totalTicks = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()))
+    for (let i = 0; i < totalTicks; i++) simulation.tick()
+
+    // Apply final positions once
+    link
+      .attr('x1', (d: any) => d.source.x)
+      .attr('y1', (d: any) => d.source.y)
+      .attr('x2', (d: any) => d.target.x)
+      .attr('y2', (d: any) => d.target.y)
+    // Compute bounding box of all nodes, then scale and center on Trump
+    const pad = 40
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+    for (const n of data.nodes as any[]) {
+      const r = nodeRadius(n)
+      if (n.x - r < minX) minX = n.x - r
+      if (n.x + r > maxX) maxX = n.x + r
+      if (n.y - r < minY) minY = n.y - r
+      if (n.y + r > maxY) maxY = n.y + r
+    }
+    const graphW = maxX - minX
+    const graphH = maxY - minY
+    const scale = Math.min((width - pad * 2) / graphW, (height - pad * 2) / graphH, 1.5)
+
+    const trumpData = data.nodes.find((n) => n.id === 'trump-donald-j') as any
+    const cx = trumpData ? trumpData.x : (minX + maxX) / 2
+    const cy = trumpData ? trumpData.y : (minY + maxY) / 2
+    const offsetX = width / 2 - cx * scale
+    const offsetY = height / 2 - cy * scale
+    g.attr('transform', `translate(${offsetX},${offsetY}) scale(${scale})`)
+
+    entityNodes.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y)
+    appointeeNodes.attr('transform', (d: any) => `translate(${d.x},${d.y}) rotate(45)`)
+    trumpNode.attr('transform', (d: any) => `translate(${d.x},${d.y})`)
+    entityLabel.attr('x', (d: any) => d.x).attr('y', (d: any) => d.y)
 
     svg.call(
       d3
         .zoom<SVGSVGElement, unknown>()
         .scaleExtent([0.3, 5])
         .on('zoom', (event) => {
-          g.attr('transform', event.transform)
+          const k = event.transform.k * scale
+          const tx = event.transform.x + offsetX * event.transform.k
+          const ty = event.transform.y + offsetY * event.transform.k
+          g.attr('transform', `translate(${tx},${ty}) scale(${k})`)
         }),
     )
   }
@@ -426,24 +558,6 @@
     applyFilters()
   })
 
-  function drag(sim: d3.Simulation<any, any>) {
-    return d3
-      .drag()
-      .on('start', (event: any) => {
-        if (!event.active) sim.alphaTarget(0.05).restart()
-        event.subject.fx = event.subject.x
-        event.subject.fy = event.subject.y
-      })
-      .on('drag', (event: any) => {
-        event.subject.fx = event.x
-        event.subject.fy = event.y
-      })
-      .on('end', (event: any) => {
-        if (!event.active) sim.alphaTarget(0)
-        event.subject.fx = null
-        event.subject.fy = null
-      })
-  }
 
   function formatMoney(v: number | null | undefined): string {
     if (!v) return '—'
