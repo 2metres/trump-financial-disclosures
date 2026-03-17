@@ -1,12 +1,15 @@
 <script lang="ts">
   import BipartiteGraph from './lib/BipartiteGraph.svelte'
+  import FilterBar from './lib/FilterBar.svelte'
 </script>
 
 <div class="min-h-screen flex flex-col">
   <!-- Header -->
   <header class="border-b border-neutral-800 px-6 py-5">
     <div class="max-w-[1600px] mx-auto">
-      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-gold-400 mb-1">Investigation</p>
+      <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-gold-400 mb-1">
+        Investigation
+      </p>
       <h1 class="font-serif text-4xl md:text-5xl text-neutral-100 leading-[1.1] tracking-tight">
         Follow the Money
       </h1>
@@ -16,6 +19,9 @@
       </p>
     </div>
   </header>
+
+  <!-- Filter Bar -->
+  <FilterBar />
 
   <!-- View -->
   <main class="flex-1 relative">

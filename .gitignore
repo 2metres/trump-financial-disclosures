@@ -26,3 +26,6 @@ dist-ssr
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+
+# Generated data files
+public/data/*.parquet
