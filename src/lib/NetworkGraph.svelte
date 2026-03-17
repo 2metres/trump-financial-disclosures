@@ -21,7 +21,7 @@
   }
 
   onMount(async () => {
-    const res = await fetch('/data/network.json')
+    const res = await fetch(`${import.meta.env.BASE_URL}data/network.json`)
     const data: {
       nodes: { id: string; name: string; agency: string; title: string; net_worth_low: number }[]
       links: { source: string; target: string; weight: number }[]

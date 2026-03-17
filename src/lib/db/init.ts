@@ -4,14 +4,16 @@ import type { DuckDB } from './types'
 // CDN bundles via jsDelivr — avoids needing to configure Vite to copy WASM assets
 const JSDELIVR_BUNDLES = duckdb.getJsDelivrBundles()
 
+const base = import.meta.env.BASE_URL
+
 const PARQUET_FILES = [
-  { name: 'appointees.parquet', path: '/data/appointees.parquet', table: 'appointees' },
+  { name: 'appointees.parquet', path: `${base}data/appointees.parquet`, table: 'appointees' },
   {
     name: 'disclosure_entries.parquet',
-    path: '/data/disclosure_entries.parquet',
+    path: `${base}data/disclosure_entries.parquet`,
     table: 'disclosure_entries',
   },
-  { name: 'documents.parquet', path: '/data/documents.parquet', table: 'documents' },
+  { name: 'documents.parquet', path: `${base}data/documents.parquet`, table: 'documents' },
 ] as const
 
 /** Singleton promise — only one initialization can run at a time. */
@@ -40,7 +42,6 @@ async function initialize(): Promise<DuckDB> {
 
   await db.instantiate(bundle.mainModule, bundle.pthreadWorker)
 
-  // Open with default (in-memory) config
   await db.open({ path: ':memory:' })
 
   const conn = await db.connect()
@@ -52,6 +53,11 @@ async function initialize(): Promise<DuckDB> {
       const buf = new Uint8Array(await res.arrayBuffer())
       await db.registerFileBuffer(file.name, buf)
       await conn.query(`CREATE TABLE ${file.table} AS SELECT * FROM '${file.name}'`)
+    }
+
+    // Read-only in production to prevent accidental mutations
+    if (import.meta.env.PROD) {
+      await conn.query("SET access_mode = 'read_only'")
     }
   } catch (err) {
     await conn.close()

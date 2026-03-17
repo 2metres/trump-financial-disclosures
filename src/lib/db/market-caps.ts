@@ -27,7 +27,7 @@ let cached: MarketCapFile | null = null
 export async function loadMarketCaps(): Promise<MarketCapFile> {
   if (cached) return cached
 
-  const resp = await fetch('/data/market-caps.json')
+  const resp = await fetch(`${import.meta.env.BASE_URL}data/market-caps.json`)
   if (!resp.ok) {
     console.warn('Failed to load market-caps.json:', resp.status)
     cached = { tickers: {}, nameIndex: {} }

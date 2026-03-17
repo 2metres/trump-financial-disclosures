@@ -6,7 +6,7 @@
   let tooltip: HTMLDivElement
 
   onMount(async () => {
-    const res = await fetch('/data/tree.json')
+    const res = await fetch(`${import.meta.env.BASE_URL}data/tree.json`)
     const treeData = await res.json()
 
     const size = Math.min(container.clientWidth, container.clientHeight || window.innerHeight - 200)
