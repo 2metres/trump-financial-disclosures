@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Nav from './lib/Nav.svelte'
   import BipartiteGraph from './lib/BipartiteGraph.svelte'
-  import WealthMap from './lib/WealthMap.svelte'
   import FilterBar from './lib/FilterBar.svelte'
+  import Nav from './lib/Nav.svelte'
+  import WealthMap from './lib/WealthMap.svelte'
 
   let activeView = $state<'bipartite' | 'wealthmap'>('bipartite')
 </script>
@@ -10,7 +10,7 @@
 <div class="min-h-screen flex flex-col">
   <!-- Header -->
   <header class="border-b border-neutral-800 px-6 py-5">
-    <div class="max-w-[1600px] mx-auto">
+    <div class="max-w-8xl mx-auto">
       <p class="font-mono text-[11px] tracking-[0.2em] uppercase text-gold-400 mb-1">
         Investigation
       </p>
@@ -43,7 +43,7 @@
 
   <!-- Footer -->
   <footer class="border-t border-neutral-800 px-6 py-4">
-    <div class="max-w-[1600px] mx-auto flex justify-between items-center">
+    <div class="max-w-8xl mx-auto flex justify-between items-center">
       <p class="font-mono text-[10px] text-neutral-600">
         Data: ProPublica Trump Team Financial Disclosures &middot; OGE Forms 278e/278-T
       </p>
