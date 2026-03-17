@@ -131,7 +131,7 @@
     // Update link visibility — visible only if both endpoints visible
     linkSelection
       .attr('stroke-opacity', (l: any) =>
-        visibleIds.has(l.source.id) && visibleIds.has(l.target.id) ? 0.12 : 0.0,
+        visibleIds.has(l.source.id) && visibleIds.has(l.target.id) ? 0 : 0,
       )
       .attr('pointer-events', (l: any) =>
         visibleIds.has(l.source.id) && visibleIds.has(l.target.id) ? 'all' : 'none',
