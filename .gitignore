@@ -27,5 +27,4 @@ dist-ssr
 .dolt/
 *.db
 
-# Generated data files
-public/data/*.parquet
+# Generated data files (parquet tracked for GitHub Pages deploy)
