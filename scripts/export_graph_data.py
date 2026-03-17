@@ -73,16 +73,19 @@ def main():
         WHERE description IS NOT NULL AND description != ''
     """).fetchall()
 
-    # Build entity → appointees mapping and entity → total value
+    # Build entity → appointees mapping and per-holding values
     entity_to_slugs = defaultdict(set)
     slug_to_entities = defaultdict(set)
     entity_total_value: dict[str, int] = defaultdict(int)
+    holding_value: dict[tuple[str, str], int] = defaultdict(int)  # (slug, desc) -> value
     for slug, desc, val_cat in entries:
         desc = desc.strip()
         if desc:
             entity_to_slugs[desc].add(slug)
             slug_to_entities[slug].add(desc)
-            entity_total_value[desc] += VALUE_MIDPOINTS.get(val_cat or '', 0)
+            val = VALUE_MIDPOINTS.get(val_cat or '', 0)
+            entity_total_value[desc] += val
+            holding_value[(slug, desc)] += val
 
     # Filter to entities shared by 2+ appointees
     shared_entities = {k: v for k, v in entity_to_slugs.items() if len(v) >= 2}
@@ -106,23 +109,29 @@ def main():
         return n
 
     # Group entities by normalized name, merge their slug sets and values
-    norm_groups: dict[str, tuple[str, set, int]] = {}  # norm -> (best_name, merged_slugs, merged_value)
+    # Also track original descriptions per group for holding_value lookups
+    norm_groups: dict[str, tuple[str, set, int, list[str]]] = {}
     for entity, slugs in interesting_entities.items():
         norm = normalize_name(entity)
         val = entity_total_value.get(entity, 0)
         if norm in norm_groups:
-            best_name, merged, merged_val = norm_groups[norm]
+            best_name, merged, merged_val, orig_descs = norm_groups[norm]
             merged.update(slugs)
             merged_val += val
-            # Prefer the name with more info or proper casing
+            orig_descs.append(entity)
             if len(entity) > len(best_name) or (entity[0].isupper() and best_name[0].islower()):
                 best_name = entity
-            norm_groups[norm] = (best_name, merged, merged_val)
+            norm_groups[norm] = (best_name, merged, merged_val, orig_descs)
         else:
-            norm_groups[norm] = (entity, set(slugs), val)
+            norm_groups[norm] = (entity, set(slugs), val, [entity])
 
     deduped_entities: dict[str, tuple[set, int]] = {
-        name: (slugs, val) for name, slugs, val in norm_groups.values()
+        name: (slugs, val) for name, slugs, val, _ in norm_groups.values()
+    }
+
+    # Build canonical_name -> list of original descriptions for holding lookups
+    canonical_to_originals: dict[str, list[str]] = {
+        name: orig for name, _, _, orig in norm_groups.values()
     }
     print(f"After dedup: {len(deduped_entities)} (was {len(interesting_entities)})")
 
@@ -215,9 +224,12 @@ def main():
             "total_value": total_val,
             "category": cat,
         })
+        orig_descs = canonical_to_originals.get(entity, [entity])
         for slug in slugs:
             if slug in involved_slugs:
-                bipartite_links.append({"source": slug, "target": eid})
+                # Sum holding value across all original description variants
+                hv = sum(holding_value.get((slug, od), 0) for od in orig_descs)
+                bipartite_links.append({"source": slug, "target": eid, "value": hv})
 
     bipartite = {"nodes": bipartite_nodes, "links": bipartite_links}
     with open(os.path.join(OUT, "bipartite.json"), "w") as f:

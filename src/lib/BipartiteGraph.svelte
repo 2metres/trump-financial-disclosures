@@ -8,7 +8,7 @@
     total_value?: number;
     x?: number; y?: number; fx?: number | null; fy?: number | null;
   }
-  interface GraphLink { source: any; target: any }
+  interface GraphLink { source: any; target: any; value?: number }
 
   const categoryColors: Record<string, string> = {
     political: '#c2342d',
@@ -42,6 +42,7 @@
   let container: HTMLDivElement
   let selected = $state<GraphNode | null>(null)
   let connectedAppointees = $state<GraphNode[]>([])
+  let holdingValues = $state<Record<string, number>>({})  // nodeId -> holding value for current selection
   let allData: { nodes: GraphNode[]; links: GraphLink[] } | null = null
   let stats = $state({ nodes: 0, links: 0, entities: 0, appointees: 0 })
 
@@ -185,12 +186,20 @@
       _event.stopPropagation()
       selected = d
       tooltip.style('opacity', 0)
-      // Find connected nodes
+      // Find connected nodes and their holding values
       const connected = new Set<string>()
+      const hv: Record<string, number> = {}
       data.links.forEach((l: any) => {
-        if (l.source.id === d.id) connected.add(l.target.id)
-        if (l.target.id === d.id) connected.add(l.source.id)
+        if (l.source.id === d.id) {
+          connected.add(l.target.id)
+          hv[l.target.id] = (l.value || 0)
+        }
+        if (l.target.id === d.id) {
+          connected.add(l.source.id)
+          hv[l.source.id] = (l.value || 0)
+        }
       })
+      holdingValues = hv
 
       if (d.type === 'entity') {
         connectedAppointees = data.nodes.filter(n => connected.has(n.id) && n.type === 'appointee')
@@ -294,11 +303,11 @@
 
         <h4 class="font-mono text-[10px] text-neutral-600 uppercase tracking-wider mb-2">Appointees</h4>
         <div class="space-y-2">
-          {#each connectedAppointees.toSorted((a, b) => (b.net_worth_low || 0) - (a.net_worth_low || 0)) as a}
+          {#each connectedAppointees.toSorted((a, b) => (holdingValues[b.id] || 0) - (holdingValues[a.id] || 0)) as a}
             <div class="border-l-2 pl-3 py-1" style="border-color: {getAgencyColor(a.agency || 'Unknown')}">
               <p class="font-sans text-sm text-neutral-200">{a.name}</p>
               <p class="font-mono text-[10px] text-neutral-500">{a.title}</p>
-              <p class="font-mono text-[10px] text-neutral-600">{a.agency} &middot; {formatMoney(a.net_worth_low)}</p>
+              <p class="font-mono text-[10px] text-neutral-600">{a.agency} &middot; <span class="text-gold-400">{formatMoney(holdingValues[a.id])}</span></p>
             </div>
           {/each}
         </div>
