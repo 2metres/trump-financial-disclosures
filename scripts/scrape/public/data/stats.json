@@ -1,0 +1,208 @@
+{
+  "total_appointees": 1581,
+  "total_entries": 143330,
+  "total_shared_entities": 7275,
+  "total_agencies": 62,
+  "top_entities": [
+    {
+      "name": "U.S. Bank #1 (Cash)",
+      "count": 346
+    },
+    {
+      "name": "Roth IRA",
+      "count": 298
+    },
+    {
+      "name": "U.S. Bank #2 (Cash)",
+      "count": 283
+    },
+    {
+      "name": "U.S. Bank (Cash)",
+      "count": 267
+    },
+    {
+      "name": "Apple, Inc. (AAPL)",
+      "count": 229
+    },
+    {
+      "name": "Amazon.com, Inc. (AMZN)",
+      "count": 206
+    },
+    {
+      "name": "Microsoft Corp. (MSFT)",
+      "count": 192
+    },
+    {
+      "name": "Nvidia Corp. (NVDA)",
+      "count": 191
+    },
+    {
+      "name": "IRA",
+      "count": 188
+    },
+    {
+      "name": "IRA #1",
+      "count": 154
+    },
+    {
+      "name": "Tesla, Inc. (TSLA)",
+      "count": 138
+    },
+    {
+      "name": "Alphabet, Inc. (GOOG)",
+      "count": 136
+    },
+    {
+      "name": "U.S. Bank #3 (Cash)",
+      "count": 136
+    },
+    {
+      "name": "Vanguard 500 Index Fund ETF Shares (VOO)",
+      "count": 133
+    },
+    {
+      "name": "BROKERAGE ACCOUNT",
+      "count": 128
+    },
+    {
+      "name": "SPDR S&P 500 ETF TRUST (SPY)",
+      "count": 126
+    },
+    {
+      "name": "FIDELITY 500 INDEX FUND (FXAIX)",
+      "count": 125
+    },
+    {
+      "name": "Vanguard Total Stock Market Index Fund ETF Class Shares (VTI)",
+      "count": 110
+    },
+    {
+      "name": "IRA #2",
+      "count": 104
+    },
+    {
+      "name": "Walmart, Inc. (WMT)",
+      "count": 101
+    },
+    {
+      "name": "iShares Core S&P 500 ETF (IVV)",
+      "count": 97
+    },
+    {
+      "name": "Exxon Mobil Corp. (XOM)",
+      "count": 96
+    },
+    {
+      "name": "Bitcoin",
+      "count": 94
+    },
+    {
+      "name": "Palantir Technologies Inc. Class A Common Stock (PLTR)",
+      "count": 93
+    },
+    {
+      "name": "Invesco QQQ Trust, Series 1 (QQQ)",
+      "count": 91
+    },
+    {
+      "name": "JPMorgan Chase & Co. (JPM)",
+      "count": 89
+    },
+    {
+      "name": "Meta Platforms Inc. Class A Common Stock (META)",
+      "count": 87
+    },
+    {
+      "name": "Berkshire Hathaway Inc. (BRKB)",
+      "count": 87
+    },
+    {
+      "name": "Visa, Inc. (V)",
+      "count": 85
+    },
+    {
+      "name": "cash",
+      "count": 83
+    },
+    {
+      "name": "Chevron Corp. (CVX)",
+      "count": 82
+    },
+    {
+      "name": "Costco Wholesale Corp. (COST)",
+      "count": 80
+    },
+    {
+      "name": "JOHNSON & Johnson (JNJ)",
+      "count": 80
+    },
+    {
+      "name": "brokerage account #1",
+      "count": 79
+    },
+    {
+      "name": "Vanguard 500 Index Fund Admiral Shares (VFIAX)",
+      "count": 78
+    },
+    {
+      "name": "Eli Lilly & Co. (LLY)",
+      "count": 76
+    },
+    {
+      "name": "Republican National Committee",
+      "count": 76
+    },
+    {
+      "name": "U.S. brokerage account (Cash)",
+      "count": 73
+    },
+    {
+      "name": "The Home Depot, Inc. (HD)",
+      "count": 72
+    },
+    {
+      "name": "brokerage account #2",
+      "count": 71
+    },
+    {
+      "name": "The Walt Disney Co. (DIS)",
+      "count": 70
+    },
+    {
+      "name": "TRADITIONAL IRA",
+      "count": 69
+    },
+    {
+      "name": "Fidelity Government Money Market Fund (SPAXX)",
+      "count": 69
+    },
+    {
+      "name": "Procter & Gamble Co. (PG)",
+      "count": 69
+    },
+    {
+      "name": "Broadcom, Inc. (AVGO)",
+      "count": 68
+    },
+    {
+      "name": "U.S. Bank #4 (Cash)",
+      "count": 66
+    },
+    {
+      "name": "Vanguard Total Stock Market Index Fund Admiral Class Shares (VTSAX)",
+      "count": 65
+    },
+    {
+      "name": "Bank of America Corp. (BAC)",
+      "count": 65
+    },
+    {
+      "name": "Verizon Communications, Inc. (VZ)",
+      "count": 65
+    },
+    {
+      "name": "ISHARES Core S&P Small-Cap ETF (IJR)",
+      "count": 64
+    }
+  ]
+}
