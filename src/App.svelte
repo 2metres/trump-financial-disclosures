@@ -1,6 +1,10 @@
 <script lang="ts">
+  import Nav from './lib/Nav.svelte'
   import BipartiteGraph from './lib/BipartiteGraph.svelte'
+  import WealthMap from './lib/WealthMap.svelte'
   import FilterBar from './lib/FilterBar.svelte'
+
+  let activeView = $state<'bipartite' | 'wealthmap'>('bipartite')
 </script>
 
 <div class="min-h-screen flex flex-col">
@@ -20,12 +24,21 @@
     </div>
   </header>
 
-  <!-- Filter Bar -->
-  <FilterBar />
+  <!-- Navigation -->
+  <Nav bind:activeView />
+
+  <!-- Filter Bar (bipartite only) -->
+  {#if activeView === 'bipartite'}
+    <FilterBar />
+  {/if}
 
   <!-- View -->
   <main class="flex-1 relative">
-    <BipartiteGraph />
+    {#if activeView === 'bipartite'}
+      <BipartiteGraph />
+    {:else if activeView === 'wealthmap'}
+      <WealthMap />
+    {/if}
   </main>
 
   <!-- Footer -->

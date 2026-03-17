@@ -1,12 +1,11 @@
 <script lang="ts">
-  type View = 'bipartite' | 'network' | 'tree'
+  type View = 'bipartite' | 'wealthmap'
 
   let { activeView = $bindable() }: { activeView: View } = $props()
 
   const views: { id: View; label: string; description: string }[] = [
-    { id: 'bipartite', label: 'Shared Holdings', description: 'Who holds what' },
-    { id: 'network', label: 'Connections', description: 'Who overlaps with whom' },
-    { id: 'tree', label: 'Agency Map', description: 'Follow the hierarchy' },
+    { id: 'bipartite', label: 'Holdings Network', description: 'Who holds what' },
+    { id: 'wealthmap', label: 'Wealth Map', description: 'Total wealth composition' },
   ]
 </script>
 
