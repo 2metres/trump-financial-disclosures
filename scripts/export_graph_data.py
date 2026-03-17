@@ -39,7 +39,7 @@ def is_boring(desc: str) -> bool:
     desc_lower = desc.lower()
     return any(b.lower() in desc_lower for b in boring)
 
-DB = "data/disclosures.duckdb"
+DB = "scripts/scrape/data/disclosures.duckdb"
 OUT = "public/data"
 
 
@@ -85,22 +85,94 @@ def main():
         k: v for k, v in shared_entities.items()
         if not is_boring(k) and len(v) >= 3
     }
+    # --- Deduplicate entities ---
+    # Normalize name for dedup: lowercase, strip ticker suffixes, collapse whitespace
+    def normalize_name(desc: str) -> str:
+        n = desc.strip()
+        n = re.sub(r'\s*\([a-zA-Z]{1,5}\)\s*$', '', n)  # strip ticker like (mrk), (AAPL)
+        n = re.sub(r'\s+', ' ', n)
+        n = n.lower().strip().rstrip(',').rstrip('.')
+        # Normalize common variants
+        n = n.replace('&amp;', '&').replace(',', '').replace('.', '')
+        return n
+
+    # Group entities by normalized name, merge their slug sets
+    from collections import OrderedDict
+    norm_groups: dict[str, tuple[str, set]] = {}  # norm -> (best_name, merged_slugs)
+    for entity, slugs in interesting_entities.items():
+        norm = normalize_name(entity)
+        if norm in norm_groups:
+            best_name, merged = norm_groups[norm]
+            merged.update(slugs)
+            # Prefer the name with more info or proper casing
+            if len(entity) > len(best_name) or (entity[0].isupper() and best_name[0].islower()):
+                best_name = entity
+            norm_groups[norm] = (best_name, merged)
+        else:
+            norm_groups[norm] = (entity, set(slugs))
+
+    deduped_entities = {name: slugs for name, slugs in norm_groups.values()}
+    print(f"After dedup: {len(deduped_entities)} (was {len(interesting_entities)})")
+
     # Categorize entities for visual grouping
     def categorize(desc: str) -> str:
         d = desc.lower()
-        if any(w in d for w in ['republican', 'democrat', 'trump', 'committee', 'campaign', 'inaugural', 'pac']):
+        # Political: campaigns, PACs, party orgs, inaugurals
+        if any(w in d for w in ['republican national', 'democrat', 'trump', 'inaugural', 'save america']):
             return 'political'
-        if any(w in d for w in ['heritage', 'institute', 'foundation', 'society', 'council', 'center for']):
-            return 'think_tank'
-        if any(w in d for w in ['bitcoin', 'ethereum', 'coinbase', 'crypto', 'defi', 'token']):
+        if re.search(r'\bpac\b', d) or 'for president' in d:
+            return 'political'
+        # Policy: think tanks, advocacy institutes
+        if any(w in d for w in ['heritage foundation', 'america first policy',
+                                'cornerstone institute', 'conservative partnership',
+                                'center for renewing', 'federalist society']):
+            return 'policy'
+        # Crypto
+        if any(w in d for w in ['bitcoin', 'ethereum', 'coinbase', 'crypto', 'solana', 'xrp']):
             return 'crypto'
-        if any(w in d for w in ['llc', 'l.l.c', 'lp', 'l.p.', 'holdings', 'partners', 'capital', 'fund', 'ventures']):
-            return 'private'
-        if any(w in d for w in ['department of', 'u.s. ', 'federal', 'government', 'agency']):
+        # Government
+        if any(w in d for w in ['department of education', 'commonwealth of virginia',
+                                'state of florida', 'u.s. department']):
             return 'government'
+        # Real assets
+        if any(w in d for w in ['gold coins', 'silver coins', 'real estate', '529 plan']):
+            return 'real_assets'
+        # Finance: banks, lenders, insurance, financial services
+        if any(w in d for w in ['goldman sachs', 'morgan stanley', 'american express',
+                                'citibank', 'usaa', 'mortgage', 'pnc bank', 'truist',
+                                'northwestern mutual', 'mastercard', 'visa inc',
+                                'navy federal', 'capital one', 'citizens bank',
+                                'discover', 'blackstone', 'deloitte', 'sallie mae',
+                                'edfinancial', 's&p global']):
+            return 'finance'
+        # Pharma/Health
+        if any(w in d for w in ['merck', 'medtronic', 'johnson & johnson', 'abbott lab',
+                                'stryker', 'intuitive surgical', 'eli lilly', 'abbvie',
+                                'pfizer']):
+            return 'pharma'
+        # Tech
+        if any(w in d for w in ['microsoft', 'apple inc', 'amazon', 'meta platforms',
+                                'oracle', 'nvidia', 'advanced micro', 'broadcom',
+                                'qualcomm', 'salesforce', 'alphabet', 'servicenow',
+                                'palo alto networks', 'texas instruments', 'uber',
+                                'paychex']):
+            return 'tech'
+        # Energy/Industrial
+        if any(w in d for w in ['exxon', 'chevron', 'ge aerospace', 'ge vernova',
+                                'eaton corp', 'eversource', 'nextera', 'duke energy',
+                                'linde', 'union pacific', 'johnson controls',
+                                'philip morris', 'lockheed martin', 'prologis']):
+            return 'energy'
+        # Telecom/Media
+        if any(w in d for w in ['at&t', 'verizon', 'fox corp']):
+            return 'telecom'
+        # Consumer
+        if any(w in d for w in ['walmart', 'home depot', 'procter & gamble', 'pepsico',
+                                'tesla', 'lowes', "lowe's"]):
+            return 'consumer'
         return 'other'
 
-    top_entities = sorted(interesting_entities.items(), key=lambda x: -len(x[1]))[:100]
+    top_entities = sorted(deduped_entities.items(), key=lambda x: -len(x[1]))[:100]
 
     involved_slugs = set()
     for _, slugs in top_entities:

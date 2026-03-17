@@ -40,11 +40,13 @@ body::before {
   border: 1px solid var(--color-neutral-700);
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.5;
   color: var(--color-neutral-300);
   z-index: 100;
   max-width: 300px;
   backdrop-filter: blur(8px);
+  transition: opacity 0.15s ease;
 }
 
 .tooltip strong {

@@ -11,11 +11,17 @@
 
   const categoryColors: Record<string, string> = {
     political: '#c2342d',
-    think_tank: '#d4a23a',
+    policy: '#e07c3e',
     crypto: '#22d3ee',
-    private: '#a78bfa',
-    government: '#4ade80',
-    other: '#737373',
+    finance: '#a78bfa',
+    pharma: '#4ade80',
+    tech: '#3b82f6',
+    energy: '#d4a23a',
+    telecom: '#f472b6',
+    consumer: '#fb923c',
+    government: '#6ee7b7',
+    real_assets: '#a3a3a3',
+    other: '#525252',
   }
 
   const agencyColorMap: Record<string, string> = {}
@@ -37,6 +43,19 @@
   let connectedAppointees = $state<GraphNode[]>([])
   let allData: { nodes: GraphNode[]; links: GraphLink[] } | null = null
   let stats = $state({ nodes: 0, links: 0, entities: 0, appointees: 0 })
+
+  // Store refs for resetting highlights from outside D3
+  let nodeSelection: d3.Selection<any, any, any, any>
+  let linkSelection: d3.Selection<any, any, any, any>
+  let labelSelection: d3.Selection<any, any, any, any>
+
+  function clearSelection() {
+    selected = null
+    connectedAppointees = []
+    if (nodeSelection) nodeSelection.attr('fill-opacity', (d: any) => d.type === 'entity' ? 0.85 : 0.7)
+    if (linkSelection) linkSelection.attr('stroke', '#333').attr('stroke-opacity', 0.12).attr('stroke-width', 0.5)
+    if (labelSelection) labelSelection.attr('opacity', 1)
+  }
 
   onMount(async () => {
     const res = await fetch('/data/bipartite.json')
@@ -74,6 +93,7 @@
       .attr('stroke', '#333')
       .attr('stroke-opacity', 0.12)
       .attr('stroke-width', 0.5)
+    linkSelection = link
 
     const node = g.append('g')
       .selectAll('circle')
@@ -91,6 +111,7 @@
       .attr('stroke', 'none')
       .attr('cursor', 'pointer')
       .call(drag(simulation) as any)
+    nodeSelection = node
 
     // Entity labels for large nodes
     const entityLabel = g.append('g')
@@ -107,10 +128,46 @@
       .attr('text-anchor', 'middle')
       .attr('dy', -10)
       .attr('pointer-events', 'none')
+    labelSelection = entityLabel
+
+    // Hover tooltip
+    const tooltip = d3.select(container)
+      .append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0)
+
+    node.on('mouseover', function(event: MouseEvent, d: any) {
+      const lines: string[] = []
+      if (d.type === 'entity') {
+        lines.push(`<strong>${d.name}</strong>`)
+        lines.push(`${d.category?.replace('_', ' ') || 'entity'} · ${d.count || 0} appointees`)
+      } else {
+        lines.push(`<strong>${d.name}</strong>`)
+        if (d.title) lines.push(d.title)
+        if (d.agency) lines.push(d.agency)
+        if (d.net_worth_low) lines.push(formatMoney(d.net_worth_low))
+      }
+      const [mx, my] = d3.pointer(event, container)
+      tooltip.html(lines.join('<br>'))
+        .style('left', (mx + 12) + 'px')
+        .style('top', (my - 10) + 'px')
+        .style('opacity', 1)
+    })
+    .on('mousemove', function(event: MouseEvent) {
+      const [mx, my] = d3.pointer(event, container)
+      tooltip
+        .style('left', (mx + 12) + 'px')
+        .style('top', (my - 10) + 'px')
+    })
+    .on('mouseout', function() {
+      tooltip.style('opacity', 0)
+    })
 
     // Click to select
     node.on('click', function(_event: MouseEvent, d: any) {
+      _event.stopPropagation()
       selected = d
+      tooltip.style('opacity', 0)
       // Find connected nodes
       const connected = new Set<string>()
       data.links.forEach((l: any) => {
@@ -136,11 +193,7 @@
     // Click background to deselect
     svg.on('click', function(event: MouseEvent) {
       if (event.target === svg.node()) {
-        selected = null
-        connectedAppointees = []
-        node.attr('fill-opacity', (d: any) => d.type === 'entity' ? 0.85 : 0.7)
-        link.attr('stroke', '#333').attr('stroke-opacity', 0.12).attr('stroke-width', 0.5)
-        entityLabel.attr('opacity', 1)
+        clearSelection()
       }
     })
 
@@ -173,36 +226,33 @@
   }
 </script>
 
-<div class="flex h-[calc(100vh-200px)]">
-  <!-- Graph -->
-  <div class="flex-1 relative">
-    <!-- Stats bar -->
-    <div class="absolute top-4 left-6 z-10 font-mono text-[10px] text-neutral-600 flex gap-6">
-      <span><span class="text-gold-400">{stats.appointees}</span> appointees</span>
-      <span><span class="text-neutral-400">{stats.entities}</span> shared entities</span>
-      <span>{stats.links.toLocaleString()} connections</span>
-    </div>
-
-    <!-- Category legend -->
-    <div class="absolute bottom-4 left-6 z-10 flex flex-wrap gap-3 font-mono text-[9px]">
-      {#each Object.entries(categoryColors) as [cat, color]}
-        <span class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full inline-block" style="background: {color}"></span>
-          <span class="text-neutral-500">{cat.replace('_', ' ')}</span>
-        </span>
-      {/each}
-      <span class="text-neutral-700 ml-2">click a node to inspect</span>
-    </div>
-
-    <div bind:this={container} class="w-full h-full"></div>
+<div class="relative h-[calc(100vh-200px)]">
+  <!-- Stats bar -->
+  <div class="absolute top-4 left-6 z-10 font-mono text-[10px] text-neutral-600 flex gap-6">
+    <span><span class="text-gold-400">{stats.appointees}</span> appointees</span>
+    <span><span class="text-neutral-400">{stats.entities}</span> shared entities</span>
+    <span>{stats.links.toLocaleString()} connections</span>
   </div>
 
-  <!-- Detail sidebar -->
+  <!-- Category legend -->
+  <div class="absolute bottom-4 left-6 z-10 flex flex-wrap gap-3 font-mono text-[9px]">
+    {#each Object.entries(categoryColors) as [cat, color]}
+      <span class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full inline-block" style="background: {color}"></span>
+        <span class="text-neutral-500">{cat.replace('_', ' ')}</span>
+      </span>
+    {/each}
+    <span class="text-neutral-700 ml-2">click a node to inspect</span>
+  </div>
+
+  <div bind:this={container} class="w-full h-full"></div>
+
+  <!-- Detail sidebar (overlay) -->
   {#if selected}
-    <aside class="w-80 border-l border-neutral-800 bg-ink-900/80 backdrop-blur-sm overflow-y-auto p-5 flex-shrink-0">
+    <aside class="absolute top-0 right-0 h-full border-l border-neutral-800 bg-ink-900/95 backdrop-blur-sm overflow-y-auto p-5 z-20" style="width: clamp(240px, 320px, 30vw)">
       <button
         class="absolute top-3 right-3 text-neutral-600 hover:text-neutral-400 font-mono text-xs"
-        onclick={() => { selected = null; connectedAppointees = [] }}
+        onclick={() => clearSelection()}
       >
         ESC
       </button>
@@ -223,7 +273,7 @@
 
         <h4 class="font-mono text-[10px] text-neutral-600 uppercase tracking-wider mb-2">Appointees</h4>
         <div class="space-y-2">
-          {#each connectedAppointees.sort((a, b) => (b.net_worth_low || 0) - (a.net_worth_low || 0)) as a}
+          {#each connectedAppointees.toSorted((a, b) => (b.net_worth_low || 0) - (a.net_worth_low || 0)) as a}
             <div class="border-l-2 pl-3 py-1" style="border-color: {getAgencyColor(a.agency || 'Unknown')}">
               <p class="font-sans text-sm text-neutral-200">{a.name}</p>
               <p class="font-mono text-[10px] text-neutral-500">{a.title}</p>
@@ -259,3 +309,4 @@
     </aside>
   {/if}
 </div>
+
