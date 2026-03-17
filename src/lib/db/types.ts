@@ -25,6 +25,8 @@ export interface GraphNode {
   category?: string
   count?: number
   total_value?: number
+  market_cap?: number
+  normalized_value?: number // total_value / market_cap
 }
 
 export interface GraphLink {

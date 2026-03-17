@@ -4,22 +4,26 @@
   import { getDB } from './db/init'
   import { queryBipartiteData } from './db/queries'
   import type { BipartiteData, GraphNode } from './db/types'
+  import { loadMarketCaps, getMarketCap } from './db/market-caps'
   import { filters } from './stores/filters.svelte'
 
   const categoryColors: Record<string, string> = {
-    political: '#c2342d',
-    policy: '#e07c3e',
-    crypto: '#22d3ee',
-    finance: '#a78bfa',
-    pharma: '#4ade80',
-    tech: '#3b82f6',
-    defense: '#ef4444',
-    energy: '#d4a23a',
-    telecom: '#f472b6',
-    consumer: '#fb923c',
-    government: '#6ee7b7',
-    real_assets: '#a3a3a3',
-    other: '#525252',
+    political: '#e03e3e',     // red — power, partisanship
+    policy: '#d97706',        // amber — think tanks, advocacy
+    crypto: '#06b6d4',        // cyan — digital, futuristic
+    finance: '#8b5cf6',       // violet — Wall Street
+    pharma: '#10b981',        // emerald — health, medicine
+    tech: '#3b82f6',          // blue — technology
+    defense: '#f43f5e',       // rose — military
+    fossil: '#92400e',        // brown — oil, coal
+    mining: '#ca8a04',        // dark yellow — earth, ore
+    energy: '#22c55e',        // green — clean energy
+    industrial: '#64748b',    // slate — manufacturing
+    telecom: '#ec4899',       // pink — media, comms
+    consumer: '#f97316',      // orange — retail, brands
+    government: '#14b8a6',    // teal — institutions
+    real_assets: '#a8a29e',   // stone — tangible assets
+    other: '#525252',         // dark grey
   }
 
   const agencyColorMap: Record<string, string> = {}
@@ -75,8 +79,21 @@
   }
 
   async function loadData(): Promise<BipartiteData> {
-    const db = await getDB()
-    return queryBipartiteData(db)
+    const [db, mcData] = await Promise.all([getDB(), loadMarketCaps()])
+    const data = await queryBipartiteData(db)
+
+    // Annotate entity nodes with normalized_value = total_value / market_cap
+    for (const node of data.nodes) {
+      if (node.type === 'entity' && node.total_value) {
+        const mc = getMarketCap(node.name, mcData)
+        if (mc && mc > 0) {
+          node.market_cap = mc
+          node.normalized_value = node.total_value / mc
+        }
+      }
+    }
+
+    return data
   }
 
   function isNodeVisible(d: any): boolean {
@@ -180,14 +197,21 @@
 
     const g = svg.append('g')
 
-    const valueExtent = d3.extent(
-      data.nodes.filter((n) => n.type === 'entity'),
-      (n: any) => n.total_value || 0,
-    ) as [number, number]
-    const entityRadiusScale = d3
-      .scaleSqrt()
-      .domain([0, valueExtent[1] || 1])
-      .range([6, 24])
+    // Use normalized_value (total_value / market_cap) for public stocks,
+    // falling back to total_value for non-public entities (separate scales).
+    const entitiesWithNorm = data.nodes.filter((n: any) => n.type === 'entity' && n.normalized_value)
+    const entitiesWithoutNorm = data.nodes.filter((n: any) => n.type === 'entity' && !n.normalized_value)
+
+    const normExtent = d3.extent(entitiesWithNorm, (n: any) => n.normalized_value) as [number, number]
+    const rawExtent = d3.extent(entitiesWithoutNorm, (n: any) => n.total_value || 0) as [number, number]
+
+    const normRadiusScale = d3.scaleSqrt().domain([0, normExtent[1] || 1]).range([6, 24])
+    const rawRadiusScale = d3.scaleSqrt().domain([0, rawExtent[1] || 1]).range([6, 18])
+
+    function entityRadius(d: any): number {
+      if (d.normalized_value) return normRadiusScale(d.normalized_value)
+      return rawRadiusScale(d.total_value || 0)
+    }
 
     // Appointee diamond scale based on net worth
     const nwExtent = d3.extent(
@@ -201,7 +225,7 @@
 
     function nodeRadius(d: any): number {
       return d.type === 'entity'
-        ? entityRadiusScale(d.total_value || 0)
+        ? entityRadius(d)
         : appointeeSizeScale(d.net_worth_low || 0)
     }
 
@@ -340,7 +364,7 @@
       .selectAll('circle')
       .data(data.nodes.filter((n) => n.type === 'entity'))
       .join('circle')
-      .attr('r', (d: any) => entityRadiusScale(d.total_value || 0))
+      .attr('r', (d: any) => entityRadius(d))
       .attr('fill', (d: any) => categoryColors[d.category || 'other'] || '#737373')
       .attr('fill-opacity', 0.85)
       .attr('stroke', 'none')
@@ -407,9 +431,11 @@
         const lines: string[] = []
         if (d.type === 'entity') {
           lines.push(`<strong>${d.name}</strong>`)
-          lines.push(
-            `${d.category?.replace('_', ' ') || 'entity'} · ${d.count || 0} appointees · ${formatMoney(d.total_value)}`,
-          )
+          let detail = `${d.category?.replace('_', ' ') || 'entity'} · ${d.count || 0} appointees · ${formatMoney(d.total_value)}`
+          if (d.market_cap) {
+            detail += ` · ${((d.total_value / d.market_cap) * 100).toFixed(4)}% of cap`
+          }
+          lines.push(detail)
         } else {
           lines.push(`<strong>${d.name}</strong>`)
           if (d.title) lines.push(d.title)
@@ -566,6 +592,42 @@
     if (v >= 1e3) return `$${(v / 1e3).toFixed(0)}K`
     return `$${v}`
   }
+
+  // Derived: category breakdown for appointee sidebar
+  let categoryBreakdown = $derived.by(() => {
+    if (!selected || selected.type !== 'appointee' || connectedAppointees.length === 0) return []
+    const sums: Record<string, number> = {}
+    for (const entity of connectedAppointees) {
+      const cat = entity.category || 'other'
+      sums[cat] = (sums[cat] || 0) + (holdingValues[entity.id] || 0)
+    }
+    return Object.entries(sums)
+      .map(([category, total]) => ({ category, total, color: categoryColors[category] || '#525252' }))
+      .sort((a, b) => b.total - a.total)
+  })
+
+  let categoryBreakdownTotal = $derived(
+    categoryBreakdown.reduce((sum, c) => sum + c.total, 0),
+  )
+
+  // Derived: holdings grouped by category for appointee sidebar
+  let holdingsByCategory = $derived.by(() => {
+    if (!selected || selected.type !== 'appointee' || connectedAppointees.length === 0) return []
+    const groups: Record<string, GraphNode[]> = {}
+    for (const entity of connectedAppointees) {
+      const cat = entity.category || 'other'
+      if (!groups[cat]) groups[cat] = []
+      groups[cat].push(entity)
+    }
+    return Object.entries(groups)
+      .map(([category, entities]) => ({
+        category,
+        color: categoryColors[category] || '#525252',
+        entities: entities.toSorted((a, b) => (holdingValues[b.id] || 0) - (holdingValues[a.id] || 0)),
+        total: entities.reduce((sum, e) => sum + (holdingValues[e.id] || 0), 0),
+      }))
+      .sort((a, b) => b.total - a.total)
+  })
 </script>
 
 <div class="relative h-[calc(100vh-200px)]">
@@ -580,21 +642,11 @@
   {:else}
     <!-- Stats bar -->
     <div class="absolute top-4 left-6 z-10 font-mono text-[10px] text-neutral-600 flex gap-6">
-      <span><span class="text-gold-400">{stats.appointees}</span> appointees</span>
+      <span><span class="text-gold-400">{stats.appointees}</span> of 1,581 appointees</span>
       <span><span class="text-neutral-400">{stats.entities}</span> shared entities</span>
       <span>{stats.links.toLocaleString()} connections</span>
     </div>
 
-    <!-- Category legend -->
-    <div class="absolute bottom-4 left-6 z-10 flex flex-wrap gap-3 font-mono text-[9px]">
-      {#each Object.entries(categoryColors) as [cat, color]}
-        <span class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full inline-block" style="background: {color}"></span>
-          <span class="text-neutral-500">{cat.replace('_', ' ')}</span>
-        </span>
-      {/each}
-      <span class="text-neutral-700 ml-2">click a node to inspect</span>
-    </div>
   {/if}
 
   <div bind:this={container} class="w-full h-full"></div>
@@ -624,11 +676,11 @@
           </span>
         </div>
         <h3 class="font-serif text-xl text-neutral-100 leading-tight mb-1">{selected.name}</h3>
-        <p class="font-mono text-[11px] text-neutral-500 mb-1">
+        <p class="font-mono text-[11px] text-neutral-500 mb-2">
           Shared by <span class="text-gold-400">{selected.count}</span> appointees
         </p>
-        <p class="font-mono text-[11px] text-neutral-500 mb-4">
-          Aggregate value: <span class="text-gold-400">{formatMoney(selected.total_value)}</span>
+        <p class="font-mono text-lg text-gold-400 mb-4">
+          {formatMoney(selected.total_value)}
         </p>
 
         <h4 class="font-mono text-[10px] text-neutral-600 uppercase tracking-wider mb-2">
@@ -657,25 +709,70 @@
           {formatMoney(selected.net_worth_low)}
         </p>
 
+        <!-- Stacked bar: category value breakdown -->
+        {#if categoryBreakdown.length > 0 && categoryBreakdownTotal > 0}
+          <div class="mb-3">
+            <div class="flex h-3 w-full rounded-sm overflow-hidden gap-px">
+              {#each categoryBreakdown as seg}
+                {#if seg.total > 0}
+                  <div
+                    class="h-full min-w-[2px]"
+                    style="flex: {seg.total} 0 0; background: {seg.color}; opacity: 0.85"
+                    title="{seg.category.replace('_', ' ')}: {formatMoney(seg.total)}"
+                  ></div>
+                {/if}
+              {/each}
+            </div>
+            <p class="font-mono text-[9px] text-neutral-600 mt-1">
+              Total holdings: <span class="text-gold-400">{formatMoney(categoryBreakdownTotal)}</span>
+            </p>
+          </div>
+
+          <!-- Category sums -->
+          <div class="mb-4 flex flex-wrap gap-x-3 gap-y-0.5">
+            {#each categoryBreakdown as seg}
+              {#if seg.total > 0}
+                <span class="flex items-center gap-1 font-mono text-[9px]">
+                  <span class="w-1.5 h-1.5 rounded-full inline-block shrink-0" style="background: {seg.color}"></span>
+                  <span class="text-neutral-500">{seg.category.replace('_', ' ')}</span>
+                  <span class="text-neutral-400">{formatMoney(seg.total)}</span>
+                </span>
+              {/if}
+            {/each}
+          </div>
+        {/if}
+
         <h4 class="font-mono text-[10px] text-neutral-600 uppercase tracking-wider mb-2">
           Shared Holdings
         </h4>
-        <div class="space-y-1.5">
-          {#each connectedAppointees as entity}
-            <div class="flex items-start gap-2">
-              <span
-                class="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
-                style="background: {categoryColors[entity.category || 'other']}"
-              ></span>
+        <!-- Holdings grouped by category -->
+        {#if holdingsByCategory.length > 0}
+          <div class="space-y-3">
+            {#each holdingsByCategory as group}
               <div>
-                <p class="font-sans text-xs text-neutral-300">{entity.name}</p>
-                {#if holdingValues[entity.id]}
-                  <p class="font-mono text-[9px] text-gold-400">{formatMoney(holdingValues[entity.id])}</p>
-                {/if}
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: {group.color}"></span>
+                  <span class="font-mono text-[11px] uppercase tracking-wider text-neutral-400">
+                    {group.category.replace('_', ' ')}
+                  </span>
+                  <span class="font-mono text-[10px] text-neutral-500 ml-auto">
+                    {formatMoney(group.total)}
+                  </span>
+                </div>
+                <div class="space-y-1 ml-5">
+                  {#each group.entities as entity}
+                    <div>
+                      <p class="font-sans text-xs text-neutral-300">{entity.name}</p>
+                      {#if holdingValues[entity.id]}
+                        <p class="font-mono text-[9px] text-gold-400">{formatMoney(holdingValues[entity.id])}</p>
+                      {/if}
+                    </div>
+                  {/each}
+                </div>
               </div>
-            </div>
-          {/each}
-        </div>
+            {/each}
+          </div>
+        {/if}
       {/if}
     </aside>
   {/if}

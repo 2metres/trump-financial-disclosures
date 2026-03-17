@@ -313,40 +313,64 @@ export function categorize(desc: string): string {
     return 'tech'
   }
 
-  // Energy/Industrial
+  // Fossil fuels: oil, gas, pipelines, tobacco
   if (
     [
       'exxon',
       'chevron',
-      'ge aerospace',
-      'ge vernova',
-      'eaton corp',
-      'eversource',
-      'nextera',
-      'duke energy',
+      'conocophillips',
+      'phillips 66',
+      'kinder morgan',
+      'altria group',
+      'philip morris',
+    ].some((w) => d.includes(w))
+  ) {
+    return 'fossil'
+  }
+
+  // Mining & materials
+  if (
+    [
+      'freeport-mcmoran',
       'linde',
+    ].some((w) => d.includes(w))
+  ) {
+    return 'mining'
+  }
+
+  // Energy: utilities, clean energy, nuclear
+  if (
+    [
+      'nextera',
+      'constellation energy',
+      'ge vernova',
+      'eversource',
+      'duke energy',
+      'southern company',
+    ].some((w) => d.includes(w))
+  ) {
+    return 'energy'
+  }
+
+  // Industrial
+  if (
+    [
+      'ge aerospace',
+      'eaton corp',
       'union pacific',
       'johnson controls',
-      'philip morris',
       'prologis',
       'caterpillar',
       'honeywell',
       'deere',
-      'conocophillips',
-      'southern company',
-      'phillips 66',
       '3m co',
       'illinois tool works',
-      'constellation energy',
-      'kinder morgan',
-      'freeport-mcmoran',
       'csx corp',
       'emerson electric',
-      'altria group',
       'ford motor',
     ].some((w) => d.includes(w))
   ) {
-    return 'energy'
+    return 'industrial'
   }
 
   // Telecom/Media

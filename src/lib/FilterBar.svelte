@@ -1,33 +1,15 @@
 <script lang="ts">
-  import { filters, resetFilters, isFiltersActive } from './stores/filters.svelte'
-  import SearchInput from './filters/SearchInput.svelte'
+  import { resetFilters, isFiltersActive } from './stores/filters.svelte'
   import CategoryPills from './filters/CategoryPills.svelte'
-  import ValueRange from './filters/ValueRange.svelte'
 
   let active = $derived(isFiltersActive())
 </script>
 
-<div class="border-b border-neutral-800 px-6 py-2.5 bg-ink-900/80 backdrop-blur-sm">
+<div class="border-b border-neutral-800 px-6 py-2.5 bg-ink-900/80 backdrop-blur-sm relative z-30">
   <div class="max-w-[1600px] mx-auto flex flex-wrap items-center gap-3">
-    <!-- Search -->
-    <div class="w-48 flex-shrink-0">
-      <SearchInput />
-    </div>
-
-    <!-- Divider -->
-    <span class="w-px h-5 bg-neutral-800 flex-shrink-0"></span>
-
     <!-- Category pills -->
     <div class="flex-1 min-w-0">
       <CategoryPills />
-    </div>
-
-    <!-- Divider -->
-    <span class="w-px h-5 bg-neutral-800 flex-shrink-0"></span>
-
-    <!-- Value range -->
-    <div class="flex-shrink-0">
-      <ValueRange />
     </div>
 
     <!-- Clear button — only when filters are active -->

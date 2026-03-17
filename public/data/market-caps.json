@@ -1,0 +1,890 @@
+{
+  "_generated": "2026-03-17T04:57:31.964Z",
+  "_description": "Market cap data for entity nodes. tickers keyed by symbol, nameIndex maps entity name fragments to tickers.",
+  "tickers": {
+    "MSFT": {
+      "ticker": "MSFT",
+      "market_cap": 2972579528704,
+      "name": "Microsoft Corporation",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "AAPL": {
+      "ticker": "AAPL",
+      "market_cap": 3715929735168,
+      "name": "Apple Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "AMZN": {
+      "ticker": "AMZN",
+      "market_cap": 2273012088832,
+      "name": "Amazon.com, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "META": {
+      "ticker": "META",
+      "market_cap": 1587169591296,
+      "name": "Meta Platforms, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "GOOGL": {
+      "ticker": "GOOGL",
+      "market_cap": 3696359374848,
+      "name": "Alphabet Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "ORCL": {
+      "ticker": "ORCL",
+      "market_cap": 448271974400,
+      "name": "Oracle Corporation",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "NVDA": {
+      "ticker": "NVDA",
+      "market_cap": 4453162287104,
+      "name": "NVIDIA Corporation",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "AMD": {
+      "ticker": "AMD",
+      "market_cap": 320506167296,
+      "name": "Advanced Micro Devices, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "AVGO": {
+      "ticker": "AVGO",
+      "market_cap": 1540534697984,
+      "name": "Broadcom Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "QCOM": {
+      "ticker": "QCOM",
+      "market_cap": 138194354176,
+      "name": "QUALCOMM Incorporated",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "CRM": {
+      "ticker": "CRM",
+      "market_cap": 185844580352,
+      "name": "Salesforce, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "NOW": {
+      "ticker": "NOW",
+      "market_cap": 121214820352,
+      "name": "ServiceNow, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "PANW": {
+      "ticker": "PANW",
+      "market_cap": 136639201280,
+      "name": "Palo Alto Networks, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "TXN": {
+      "ticker": "TXN",
+      "market_cap": 176748249088,
+      "name": "Texas Instruments Incorporated",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "UBER": {
+      "ticker": "UBER",
+      "market_cap": 155130822656,
+      "name": "Uber Technologies, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.186Z"
+    },
+    "PAYX": {
+      "ticker": "PAYX",
+      "market_cap": 33419870208,
+      "name": "Paychex, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "CSCO": {
+      "ticker": "CSCO",
+      "market_cap": 311741349888,
+      "name": "Cisco Systems, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "IBM": {
+      "ticker": "IBM",
+      "market_cap": 233898459136,
+      "name": "International Business Machines",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "ADBE": {
+      "ticker": "ADBE",
+      "market_cap": 103388528640,
+      "name": "Adobe Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "INTC": {
+      "ticker": "INTC",
+      "market_cap": 228579360768,
+      "name": "Intel Corporation",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "INTU": {
+      "ticker": "INTU",
+      "market_cap": 125866147840,
+      "name": "Intuit Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "TSM": {
+      "ticker": "TSM",
+      "market_cap": 1764604510208,
+      "name": "Taiwan Semiconductor Manufactur",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "AMAT": {
+      "ticker": "AMAT",
+      "market_cap": 274731859968,
+      "name": "Applied Materials, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "MU": {
+      "ticker": "MU",
+      "market_cap": 497249976320,
+      "name": "Micron Technology, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "CRWD": {
+      "ticker": "CRWD",
+      "market_cap": 107491794944,
+      "name": "CrowdStrike Holdings, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "ACN": {
+      "ticker": "ACN",
+      "market_cap": 123599880192,
+      "name": "Accenture plc",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "ASML": {
+      "ticker": "ASML",
+      "market_cap": 540125593600,
+      "name": "ASML Holding N.V. - New York Re",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "NFLX": {
+      "ticker": "NFLX",
+      "market_cap": 403827884032,
+      "name": "Netflix, Inc.",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "GS": {
+      "ticker": "GS",
+      "market_cap": 238374191104,
+      "name": "Goldman Sachs Group, Inc. (The)",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "MS": {
+      "ticker": "MS",
+      "market_cap": 247229825024,
+      "name": "Morgan Stanley",
+      "fetched_at": "2026-03-17T04:57:28.635Z"
+    },
+    "AXP": {
+      "ticker": "AXP",
+      "market_cap": 205415563264,
+      "name": "American Express Company",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "C": {
+      "ticker": "C",
+      "market_cap": 187789393920,
+      "name": "Citigroup, Inc.",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "MA": {
+      "ticker": "MA",
+      "market_cap": 453804556288,
+      "name": "Mastercard Incorporated",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "V": {
+      "ticker": "V",
+      "market_cap": 597904326656,
+      "name": "Visa Inc.",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "COF": {
+      "ticker": "COF",
+      "market_cap": 112426573824,
+      "name": "Capital One Financial Corporati",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "BX": {
+      "ticker": "BX",
+      "market_cap": 130928713728,
+      "name": "Blackstone Inc.",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "SPGI": {
+      "ticker": "SPGI",
+      "market_cap": 129171447808,
+      "name": "S&P Global Inc.",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "BRK-B": {
+      "ticker": "BRK-B",
+      "market_cap": 1061861720064,
+      "name": "Berkshire Hathaway Inc. New",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "USB": {
+      "ticker": "USB",
+      "market_cap": 79487074304,
+      "name": "U.S. Bancorp",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "ICE": {
+      "ticker": "ICE",
+      "market_cap": 92078137344,
+      "name": "Intercontinental Exchange Inc.",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "PGR": {
+      "ticker": "PGR",
+      "market_cap": 119940898816,
+      "name": "Progressive Corporation (The)",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "PNC": {
+      "ticker": "PNC",
+      "market_cap": 81166016512,
+      "name": "PNC Financial Services Group, I",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "TFC": {
+      "ticker": "TFC",
+      "market_cap": 55612977152,
+      "name": "Truist Financial Corporation",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "MRK": {
+      "ticker": "MRK",
+      "market_cap": 285388210176,
+      "name": "Merck & Company, Inc.",
+      "fetched_at": "2026-03-17T04:57:29.074Z"
+    },
+    "MDT": {
+      "ticker": "MDT",
+      "market_cap": 113290002432,
+      "name": "Medtronic plc.",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "JNJ": {
+      "ticker": "JNJ",
+      "market_cap": 586063347712,
+      "name": "Johnson & Johnson",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "ABT": {
+      "ticker": "ABT",
+      "market_cap": 191058231296,
+      "name": "Abbott Laboratories",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "SYK": {
+      "ticker": "SYK",
+      "market_cap": 133772648448,
+      "name": "Stryker Corporation",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "ISRG": {
+      "ticker": "ISRG",
+      "market_cap": 171691261952,
+      "name": "Intuitive Surgical, Inc.",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "LLY": {
+      "ticker": "LLY",
+      "market_cap": 885280931840,
+      "name": "Eli Lilly and Company",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "ABBV": {
+      "ticker": "ABBV",
+      "market_cap": 391561019392,
+      "name": "AbbVie Inc.",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "PFE": {
+      "ticker": "PFE",
+      "market_cap": 151311581184,
+      "name": "Pfizer, Inc.",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "UNH": {
+      "ticker": "UNH",
+      "market_cap": 259132358656,
+      "name": "UnitedHealth Group Incorporated",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "AMGN": {
+      "ticker": "AMGN",
+      "market_cap": 197433524224,
+      "name": "Amgen Inc.",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "TMO": {
+      "ticker": "TMO",
+      "market_cap": 174597603328,
+      "name": "Thermo Fisher Scientific Inc",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "DHR": {
+      "ticker": "DHR",
+      "market_cap": 135339393024,
+      "name": "Danaher Corporation",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "BMY": {
+      "ticker": "BMY",
+      "market_cap": 121597845504,
+      "name": "Bristol-Myers Squibb Company",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "CI": {
+      "ticker": "CI",
+      "market_cap": 71683219456,
+      "name": "The Cigna Group",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "CVS": {
+      "ticker": "CVS",
+      "market_cap": 96484483072,
+      "name": "CVS Health Corporation",
+      "fetched_at": "2026-03-17T04:57:29.553Z"
+    },
+    "ZTS": {
+      "ticker": "ZTS",
+      "market_cap": 52067905536,
+      "name": "Zoetis Inc.",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "RTX": {
+      "ticker": "RTX",
+      "market_cap": 277351464960,
+      "name": "RTX Corporation",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "GD": {
+      "ticker": "GD",
+      "market_cap": 95815311360,
+      "name": "General Dynamics Corporation",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "NOC": {
+      "ticker": "NOC",
+      "market_cap": 105036259328,
+      "name": "Northrop Grumman Corporation",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "LMT": {
+      "ticker": "LMT",
+      "market_cap": 149297856512,
+      "name": "Lockheed Martin Corporation",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "BA": {
+      "ticker": "BA",
+      "market_cap": 167754153984,
+      "name": "Boeing Company (The)",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "LHX": {
+      "ticker": "LHX",
+      "market_cap": 68500623360,
+      "name": "L3Harris Technologies, Inc.",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "BAESY": {
+      "ticker": "BAESY",
+      "market_cap": 90516733952,
+      "name": "BAE Systems PLC",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "LDOS": {
+      "ticker": "LDOS",
+      "market_cap": 21409349632,
+      "name": "Leidos Holdings, Inc.",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "HII": {
+      "ticker": "HII",
+      "market_cap": 16348110848,
+      "name": "Huntington Ingalls Industries, ",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "TXT": {
+      "ticker": "TXT",
+      "market_cap": 15998561280,
+      "name": "Textron Inc.",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "PLTR": {
+      "ticker": "PLTR",
+      "market_cap": 365256704000,
+      "name": "Palantir Technologies Inc.",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "XOM": {
+      "ticker": "XOM",
+      "market_cap": 655140192256,
+      "name": "Exxon Mobil Corporation",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "CVX": {
+      "ticker": "CVX",
+      "market_cap": 393552756736,
+      "name": "Chevron Corporation",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "GE": {
+      "ticker": "GE",
+      "market_cap": 320663420928,
+      "name": "GE Aerospace",
+      "fetched_at": "2026-03-17T04:57:29.997Z"
+    },
+    "GEV": {
+      "ticker": "GEV",
+      "market_cap": 224482394112,
+      "name": "GE Vernova Inc.",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "ETN": {
+      "ticker": "ETN",
+      "market_cap": 140047417344,
+      "name": "Eaton Corporation, PLC",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "NEE": {
+      "ticker": "NEE",
+      "market_cap": 193392508928,
+      "name": "NextEra Energy, Inc.",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "DUK": {
+      "ticker": "DUK",
+      "market_cap": 103787954176,
+      "name": "Duke Energy Corporation (Holdin",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "LIN": {
+      "ticker": "LIN",
+      "market_cap": 230496878592,
+      "name": "Linde plc",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "UNP": {
+      "ticker": "UNP",
+      "market_cap": 143725363200,
+      "name": "Union Pacific Corporation",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "JCI": {
+      "ticker": "JCI",
+      "market_cap": 80602996736,
+      "name": "Johnson Controls International ",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "PM": {
+      "ticker": "PM",
+      "market_cap": 272076455936,
+      "name": "Philip Morris International Inc",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "PLD": {
+      "ticker": "PLD",
+      "market_cap": 124625977344,
+      "name": "Prologis, Inc.",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "CAT": {
+      "ticker": "CAT",
+      "market_cap": 327482769408,
+      "name": "Caterpillar, Inc.",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "HON": {
+      "ticker": "HON",
+      "market_cap": 149072314368,
+      "name": "Honeywell International Inc.",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "DE": {
+      "ticker": "DE",
+      "market_cap": 154631012352,
+      "name": "Deere & Company",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "COP": {
+      "ticker": "COP",
+      "market_cap": 148294189056,
+      "name": "ConocoPhillips",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "SO": {
+      "ticker": "SO",
+      "market_cap": 110942863360,
+      "name": "Southern Company (The)",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "PSX": {
+      "ticker": "PSX",
+      "market_cap": 69521072128,
+      "name": "Phillips 66",
+      "fetched_at": "2026-03-17T04:57:30.435Z"
+    },
+    "MMM": {
+      "ticker": "MMM",
+      "market_cap": 78978662400,
+      "name": "3M Company",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "ITW": {
+      "ticker": "ITW",
+      "market_cap": 77422051328,
+      "name": "Illinois Tool Works Inc.",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "CEG": {
+      "ticker": "CEG",
+      "market_cap": 110617001984,
+      "name": "Constellation Energy Corporatio",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "KMI": {
+      "ticker": "KMI",
+      "market_cap": 74108305408,
+      "name": "Kinder Morgan, Inc.",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "FCX": {
+      "ticker": "FCX",
+      "market_cap": 83257090048,
+      "name": "Freeport-McMoRan, Inc.",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "CSX": {
+      "ticker": "CSX",
+      "market_cap": 73973161984,
+      "name": "CSX Corporation",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "EMR": {
+      "ticker": "EMR",
+      "market_cap": 74836779008,
+      "name": "Emerson Electric Company",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "MO": {
+      "ticker": "MO",
+      "market_cap": 113360691200,
+      "name": "Altria Group, Inc.",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "F": {
+      "ticker": "F",
+      "market_cap": 46716755968,
+      "name": "Ford Motor Company",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "ES": {
+      "ticker": "ES",
+      "market_cap": 27486351360,
+      "name": "Eversource Energy (D/B/A)",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "T": {
+      "ticker": "T",
+      "market_cap": 196590436352,
+      "name": "AT&T Inc.",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "VZ": {
+      "ticker": "VZ",
+      "market_cap": 214975365120,
+      "name": "Verizon Communications Inc.",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "FOXA": {
+      "ticker": "FOXA",
+      "market_cap": 24464527360,
+      "name": "Fox Corporation",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "CMCSA": {
+      "ticker": "CMCSA",
+      "market_cap": 110555758592,
+      "name": "Comcast Corporation",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "TMUS": {
+      "ticker": "TMUS",
+      "market_cap": 240277602304,
+      "name": "T-Mobile US, Inc.",
+      "fetched_at": "2026-03-17T04:57:30.869Z"
+    },
+    "DIS": {
+      "ticker": "DIS",
+      "market_cap": 174962376704,
+      "name": "Walt Disney Company (The)",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "WMT": {
+      "ticker": "WMT",
+      "market_cap": 1004499501056,
+      "name": "Walmart Inc.",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "HD": {
+      "ticker": "HD",
+      "market_cap": 341042298880,
+      "name": "Home Depot, Inc. (The)",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "PG": {
+      "ticker": "PG",
+      "market_cap": 355463888896,
+      "name": "Procter & Gamble Company (The)",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "PEP": {
+      "ticker": "PEP",
+      "market_cap": 215656890368,
+      "name": "Pepsico, Inc.",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "TSLA": {
+      "ticker": "TSLA",
+      "market_cap": 1484311887872,
+      "name": "Tesla, Inc.",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "LOW": {
+      "ticker": "LOW",
+      "market_cap": 135811964928,
+      "name": "Lowe's Companies, Inc.",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "COST": {
+      "ticker": "COST",
+      "market_cap": 444464005120,
+      "name": "Costco Wholesale Corporation",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "KO": {
+      "ticker": "KO",
+      "market_cap": 334751203328,
+      "name": "Coca-Cola Company (The)",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "MCD": {
+      "ticker": "MCD",
+      "market_cap": 233098870784,
+      "name": "McDonald's Corporation",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "SBUX": {
+      "ticker": "SBUX",
+      "market_cap": 111446319104,
+      "name": "Starbucks Corporation",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "TJX": {
+      "ticker": "TJX",
+      "market_cap": 173640712192,
+      "name": "TJX Companies, Inc. (The)",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "TGT": {
+      "ticker": "TGT",
+      "market_cap": 53006745600,
+      "name": "Target Corporation",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "NKE": {
+      "ticker": "NKE",
+      "market_cap": 81110204416,
+      "name": "Nike, Inc.",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "CMG": {
+      "ticker": "CMG",
+      "market_cap": 45063237632,
+      "name": "Chipotle Mexican Grill, Inc.",
+      "fetched_at": "2026-03-17T04:57:31.307Z"
+    },
+    "MDLZ": {
+      "ticker": "MDLZ",
+      "market_cap": 73756893184,
+      "name": "Mondelez International, Inc.",
+      "fetched_at": "2026-03-17T04:57:31.963Z"
+    },
+    "UL": {
+      "ticker": "UL",
+      "market_cap": 142968586240,
+      "name": "Unilever PLC",
+      "fetched_at": "2026-03-17T04:57:31.963Z"
+    },
+    "COIN": {
+      "ticker": "COIN",
+      "market_cap": 54826786816,
+      "name": "Coinbase Global, Inc. - 3",
+      "fetched_at": "2026-03-17T04:57:31.963Z"
+    },
+    "JPM": {
+      "ticker": "JPM",
+      "market_cap": 771782803456,
+      "name": "JP Morgan Chase & Co.",
+      "fetched_at": "2026-03-17T04:57:31.963Z"
+    },
+    "WFC": {
+      "ticker": "WFC",
+      "market_cap": 237785661440,
+      "name": "Wells Fargo & Company",
+      "fetched_at": "2026-03-17T04:57:31.963Z"
+    },
+    "BAC": {
+      "ticker": "BAC",
+      "market_cap": 343655448576,
+      "name": "Bank of America Corporation",
+      "fetched_at": "2026-03-17T04:57:31.963Z"
+    }
+  },
+  "nameIndex": {
+    "microsoft": "MSFT",
+    "apple inc": "AAPL",
+    "amazon": "AMZN",
+    "meta platforms": "META",
+    "alphabet": "GOOGL",
+    "oracle": "ORCL",
+    "nvidia": "NVDA",
+    "advanced micro": "AMD",
+    "broadcom": "AVGO",
+    "qualcomm": "QCOM",
+    "salesforce": "CRM",
+    "servicenow": "NOW",
+    "palo alto networks": "PANW",
+    "texas instruments": "TXN",
+    "uber": "UBER",
+    "paychex": "PAYX",
+    "cisco systems": "CSCO",
+    "international business machines": "IBM",
+    "adobe": "ADBE",
+    "intel": "INTC",
+    "intuit": "INTU",
+    "taiwan semiconductor": "TSM",
+    "applied materials": "AMAT",
+    "micron technology": "MU",
+    "crowdstrike": "CRWD",
+    "accenture": "ACN",
+    "asml": "ASML",
+    "netflix": "NFLX",
+    "ibm": "IBM",
+    "goldman sachs": "GS",
+    "morgan stanley": "MS",
+    "american express": "AXP",
+    "citigroup": "C",
+    "citibank": "C",
+    "mastercard": "MA",
+    "visa inc": "V",
+    "capital one": "COF",
+    "blackstone": "BX",
+    "s&p global": "SPGI",
+    "berkshire hathaway": "BRK-B",
+    "u.s. bancorp": "USB",
+    "us bancorp": "USB",
+    "intercontinental exchange": "ICE",
+    "progressive corp": "PGR",
+    "pnc financial": "PNC",
+    "pnc bank": "PNC",
+    "truist": "TFC",
+    "merck": "MRK",
+    "medtronic": "MDT",
+    "johnson & johnson": "JNJ",
+    "abbott lab": "ABT",
+    "stryker": "SYK",
+    "intuitive surgical": "ISRG",
+    "eli lilly": "LLY",
+    "abbvie": "ABBV",
+    "pfizer": "PFE",
+    "unitedhealth": "UNH",
+    "amgen": "AMGN",
+    "thermo fisher": "TMO",
+    "danaher": "DHR",
+    "bristol-myers": "BMY",
+    "cigna": "CI",
+    "cvs health": "CVS",
+    "zoetis": "ZTS",
+    "raytheon": "RTX",
+    "rtx": "RTX",
+    "general dynamics": "GD",
+    "northrop grumman": "NOC",
+    "lockheed martin": "LMT",
+    "boeing": "BA",
+    "l3harris": "LHX",
+    "bae systems": "BAESY",
+    "leidos": "LDOS",
+    "huntington ingalls": "HII",
+    "textron": "TXT",
+    "palantir": "PLTR",
+    "exxon": "XOM",
+    "chevron": "CVX",
+    "ge aerospace": "GE",
+    "ge vernova": "GEV",
+    "eaton corp": "ETN",
+    "nextera": "NEE",
+    "duke energy": "DUK",
+    "linde": "LIN",
+    "union pacific": "UNP",
+    "johnson controls": "JCI",
+    "philip morris": "PM",
+    "prologis": "PLD",
+    "caterpillar": "CAT",
+    "honeywell": "HON",
+    "deere": "DE",
+    "conocophillips": "COP",
+    "southern company": "SO",
+    "phillips 66": "PSX",
+    "3m co": "MMM",
+    "illinois tool works": "ITW",
+    "constellation energy": "CEG",
+    "kinder morgan": "KMI",
+    "freeport-mcmoran": "FCX",
+    "csx corp": "CSX",
+    "emerson electric": "EMR",
+    "altria group": "MO",
+    "ford motor": "F",
+    "eversource": "ES",
+    "at&t": "T",
+    "verizon": "VZ",
+    "fox corp": "FOXA",
+    "comcast": "CMCSA",
+    "t-mobile": "TMUS",
+    "walt disney": "DIS",
+    "walmart": "WMT",
+    "home depot": "HD",
+    "procter & gamble": "PG",
+    "pepsico": "PEP",
+    "tesla": "TSLA",
+    "lowe's": "LOW",
+    "lowes": "LOW",
+    "costco": "COST",
+    "coca-cola": "KO",
+    "mcdonald's": "MCD",
+    "mcdonalds": "MCD",
+    "starbucks": "SBUX",
+    "tjx": "TJX",
+    "target corp": "TGT",
+    "nike": "NKE",
+    "chipotle": "CMG",
+    "mondelez": "MDLZ",
+    "unilever": "UL",
+    "coinbase": "COIN",
+    "jpmorgan": "JPM",
+    "wells fargo": "WFC",
+    "bank of america": "BAC"
+  }
+}
