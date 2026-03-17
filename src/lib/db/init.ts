@@ -54,11 +54,6 @@ async function initialize(): Promise<DuckDB> {
       await db.registerFileBuffer(file.name, buf)
       await conn.query(`CREATE TABLE ${file.table} AS SELECT * FROM '${file.name}'`)
     }
-
-    // Read-only in production to prevent accidental mutations
-    if (import.meta.env.PROD) {
-      await conn.query("SET access_mode = 'read_only'")
-    }
   } catch (err) {
     await conn.close()
     await db.terminate()
